@@ -1,0 +1,24 @@
+# =============================================================================
+# roles/lighthouse-role/meta/main.yml — Метаданные роли
+# =============================================================================
+---
+galaxy_info:
+  author: Your Name
+  namespace: your_namespace
+  role_name: lighthouse_role
+  description: Lighthouse UI deployment with Nginx reverse proxy
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Debian
+      versions: ["11", "12"]
+    - name: Ubuntu
+      versions: ["20.04", "22.04", "24.04"]
+  galaxy_tags:
+    - web
+    - nginx
+    - lighthouse
+    - monitoring
+    - clickhouse
+
+dependencies: []

@@ -1,0 +1,55 @@
+
+## 👷 roles/lighthouse-role/defaults/main.yml
+
+
+# =============================================================================
+# roles/lighthouse-role/defaults/main.yml — Переменные по умолчанию для Lighthouse
+# =============================================================================
+---
+# -----------------------------------------------------------------------------
+# 🗄️ Репозиторий и деплой
+# -----------------------------------------------------------------------------
+lighthouse_repo: "https://github.com/xo4ychill/lighthouse.git"
+lighthouse_dir: "/opt/lighthouse"
+lighthouse_version: "master"
+
+# -----------------------------------------------------------------------------
+# 🌐 Nginx конфигурация
+# -----------------------------------------------------------------------------
+lighthouse_nginx_port: 80
+lighthouse_nginx_server_name: "_"
+lighthouse_nginx_root: "{{ lighthouse_dir }}"
+lighthouse_nginx_log_dir: "/var/log/nginx/lighthouse"
+lighthouse_security_headers:
+  X-Frame-Options: "SAMEORIGIN"
+  X-Content-Type-Options: "nosniff"
+  X-XSS-Protection: "1; mode=block"
+
+# -----------------------------------------------------------------------------
+# 🔗 Интеграция с ClickHouse
+# -----------------------------------------------------------------------------
+lighthouse_clickhouse_host: "127.0.0.1"
+lighthouse_clickhouse_port: 8123
+lighthouse_clickhouse_database: "logs"
+lighthouse_clickhouse_table: "events"
+lighthouse_clickhouse_user: "default"
+lighthouse_clickhouse_password: ""
+lighthouse_clickhouse_api_url: "/api/clickhouse"
+lighthouse_proxy_connect_timeout: 60s
+lighthouse_proxy_send_timeout: 60s
+lighthouse_proxy_read_timeout: 60s
+
+# -----------------------------------------------------------------------------
+# 🎨 Фронтенд настройки
+# -----------------------------------------------------------------------------
+lighthouse_refresh_interval: 30000
+lighthouse_theme: 'light'
+lighthouse_timezone: 'UTC'
+
+# -----------------------------------------------------------------------------
+# 📦 Зависимости
+# -----------------------------------------------------------------------------
+lighthouse_packages:
+  - nginx
+  - git
+  - curl

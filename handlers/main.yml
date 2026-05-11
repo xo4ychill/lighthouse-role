@@ -1,0 +1,19 @@
+# =============================================================================
+# roles/lighthouse-role/handlers/main.yml — Обработчики для Lighthouse
+# =============================================================================
+---
+- name: reload nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: reloaded
+    daemon_reload: true
+  listen: "reload nginx"
+  tags: [nginx, reload]
+
+- name: restart nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+    daemon_reload: true
+  listen: "restart nginx"
+  tags: [nginx, restart]

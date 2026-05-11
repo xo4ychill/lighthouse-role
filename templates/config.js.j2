@@ -1,0 +1,30 @@
+// =============================================================================
+// roles/lighthouse-role/templates/config.js.j2 — Конфигурация фронтенда
+// Генерируется через Jinja2, передаётся в браузер
+// ⚠️ НЕ включать чувствительные данные (пароли)!
+// =============================================================================
+
+window.LIGHTHOUSE_CONFIG = {
+  // 🔗 ClickHouse connection settings
+  clickhouse: {
+    // 💡 Браузер делает запросы на /api/clickhouse, Nginx проксирует на БД
+    // Это обходит CORS и скрывает реальный адрес БД от клиента
+    endpoint: "{{ lighthouse_clickhouse_api_url }}",
+    
+    // Параметры для reference (могут использоваться бэкендом)
+    host: "{{ lighthouse_clickhouse_host }}",
+    port: {{ lighthouse_clickhouse_port }},
+    database: "{{ lighthouse_clickhouse_database }}",
+    table: "{{ lighthouse_clickhouse_table }}",
+    user: "{{ lighthouse_clickhouse_user }}",
+    
+    // ⚠️ Пароль НЕ передаётся в браузер! Только для бэкенд-прокси в Nginx
+  },
+  
+  // 📊 Настройки авто-обновления
+  refreshInterval: {{ lighthouse_refresh_interval }},  // миллисекунды
+  
+  // 🎨 Интерфейс
+  theme: '{{ lighthouse_theme }}',
+  timezone: '{{ lighthouse_timezone }}'
+};
