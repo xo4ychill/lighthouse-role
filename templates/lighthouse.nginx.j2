@@ -1,75 +1,25 @@
-# =============================================================================
-# roles/lighthouse-role/templates/lighthouse.nginx.j2 — Nginx конфигурация
-# Назначение: reverse proxy для API + раздача статики фронтенда
-# =============================================================================
-
 server {
-    # 🎧 Слушаем HTTP на всех интерфейсах
-    listen {{ lighthouse_nginx_port }} default_server;
-    listen [::]:{{ lighthouse_nginx_port }} default_server ipv6only=on;
-    server_name {{ lighthouse_nginx_server_name }};
+    listen {{ lighthouse_nginx_port }};
 
-    # 📁 Корневая директория со статикой
-    root {{ lighthouse_nginx_root }};
-    index index.html index.htm;
+    root {{ lighthouse_dir }};
+    index index.html;
 
-    # 📝 Логи
-    access_log {{ lighthouse_nginx_log_dir }}/access.log;
-    error_log {{ lighthouse_nginx_log_dir }}/error.log warn;
+    # ========================================================
+    # Раздача статических файлов Lighthouse
+    # ========================================================
 
-    # 🗂️ Раздача статики
     location / {
         try_files $uri $uri/ =404;
-        autoindex off;
-        
-        # 🛡️ Security headers
-        {% for header, value in lighthouse_security_headers.items() %}
-        add_header {{ header }} "{{ value }}" always;
-        {% endfor %}
-        server_tokens off;
     }
 
-    # 🔗 Proxy для API к ClickHouse
-    location {{ lighthouse_clickhouse_api_url }} {
+    # ========================================================
+    # Proxy к ClickHouse
+    # ========================================================
+
+    location /clickhouse {
         proxy_pass http://{{ lighthouse_clickhouse_host }}:{{ lighthouse_clickhouse_port }};
-        
-        # 📦 Проброс заголовков
+
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # ⏱️ Таймауты
-        proxy_connect_timeout {{ lighthouse_proxy_connect_timeout }};
-        proxy_send_timeout {{ lighthouse_proxy_send_timeout }};
-        proxy_read_timeout {{ lighthouse_proxy_read_timeout }};
-        
-        # 🗑️ Отключаем буферизацию для streaming
-        proxy_buffering off;
-        
-        # 🔐 Basic auth (опционально)
-        {% if lighthouse_basic_auth_enabled | default(false) %}
-        auth_basic "ClickHouse API";
-        auth_basic_user_file /etc/nginx/.clickhouse_passwd;
-        {% endif %}
-        
-        # 🛡️ Ограничение методов
-        limit_except GET POST {
-            deny all;
-        }
-    }
-
-    # 🚫 Запрет доступа к скрытым файлам
-    location ~ /\. {
-        deny all;
-        access_log off;
-        log_not_found off;
-    }
-
-    # 🗑️ Кэширование статики
-    location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff2?)$ {
-        access_log off;
-        expires {{ lighthouse_cache_duration | default('30d') }};
-        add_header Cache-Control "public, immutable";
     }
 }

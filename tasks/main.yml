@@ -1,82 +1,72 @@
 ---
-# 📦 Установка пакетов
-- name: 📦 Install required packages
+# ============================================================
+# Установка пакетов
+# ============================================================
+
+- name: Install packages
   ansible.builtin.package:
-    name: "{{ lighthouse_packages }}"
+    name:
+      - nginx
+      - git
     state: present
     update_cache: true
-  tags: [packages]
 
-# 🗄️ Клонирование репозитория
-- name: 🗄️ Clone Lighthouse repository
+# ============================================================
+# Клонирование Lighthouse
+# ============================================================
+
+- name: Clone Lighthouse repository
   ansible.builtin.git:
     repo: "{{ lighthouse_repo }}"
     dest: "{{ lighthouse_dir }}"
-    version: "{{ lighthouse_version }}"
-    update: true
-    force: true
-  notify: reload nginx
-  register: _clone
-  retries: 2
-  delay: 5
-  until: _clone is success
-  tags: [git, deploy]
+    version: master
 
-# ⚙️ Деплой config.js (Jinja2 template)
-- name: ⚙️ Deploy Lighthouse config.js
+# ============================================================
+# Конфиг Lighthouse
+# ============================================================
+
+- name: Deploy config.js
   ansible.builtin.template:
-    src: "config.js.j2"
+    src: config.js.j2
     dest: "{{ lighthouse_dir }}/config.js"
     mode: "0644"
-  notify: reload nginx
-  tags: [config]
 
-# 📁 Настройка Nginx
-- name: 📁 Create nginx log directory
-  ansible.builtin.file:
-    path: "{{ lighthouse_nginx_log_dir }}"
-    state: directory
-    owner: www-data
-    group: adm
-    mode: "0755"
-  tags: [nginx]
+# ============================================================
+# Конфиг Nginx
+# ============================================================
 
-- name: ⚙️ Deploy Nginx configuration
+- name: Deploy Nginx config
   ansible.builtin.template:
-    src: "lighthouse.nginx.j2"
-    dest: "{{ lighthouse_dir }}/lighthouse.conf"
+    src: lighthouse.conf.j2
+    dest: /etc/nginx/sites-available/lighthouse.conf
     mode: "0644"
   notify: reload nginx
-  tags: [nginx, config]
 
-- name: 🔗 Symlink to sites-enabled
+- name: Enable Lighthouse site
   ansible.builtin.file:
-    src: "{{ lighthouse_dir }}/lighthouse.conf"
+    src: /etc/nginx/sites-available/lighthouse.conf
     dest: /etc/nginx/sites-enabled/lighthouse.conf
     state: link
-    force: true
-  notify: reload nginx
-  tags: [nginx]
 
-- name: 🗑️ Remove default nginx site
+- name: Remove default nginx site
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default
     state: absent
-  notify: reload nginx
-  tags: [nginx]
 
-- name: 🔍 Validate Nginx configuration
+# ============================================================
+# Проверка конфигурации Nginx
+# ============================================================
+
+- name: Validate nginx config
   ansible.builtin.command: nginx -t
-  register: _nginx_test
   changed_when: false
-  failed_when: _nginx_test.rc != 0
-  tags: [nginx, validate]
 
-# ▶️ Запуск Nginx
-- name: ▶️ Enable and start Nginx
+# ============================================================
+# Запуск Nginx
+# ============================================================
+
+- name: Enable and start nginx
   ansible.builtin.systemd:
     name: nginx
     enabled: true
     state: started
-    daemon_reload: true
-  tags: [nginx, service]
