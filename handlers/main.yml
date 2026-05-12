@@ -1,8 +1,5 @@
-# =============================================================================
-# roles/lighthouse-role/handlers/main.yml — Обработчики для Lighthouse
-# =============================================================================
 ---
 - name: reload nginx
   ansible.builtin.systemd:
     name: nginx
-    state: reloaded
+    state: reloaded                # Graceful reload без потери соединений

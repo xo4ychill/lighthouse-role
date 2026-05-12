@@ -1,12 +1,3 @@
 ---
-# ============================================================
-# Lighthouse defaults
-# ============================================================
-
-lighthouse_repo: "https://github.com/VKCOM/lighthouse.git"
-lighthouse_dir: "/opt/lighthouse"
-lighthouse_nginx_port: 80
-
-# ClickHouse endpoint
-lighthouse_clickhouse_host: "192.168.1.10"
-lighthouse_clickhouse_port: 8123
+lighthouse_repo: https://github.com/VKCOM/lighthouse.git
+lighthouse_dir: /opt/lighthouse
