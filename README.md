@@ -170,6 +170,6 @@ ansible-galaxy install xo4ychill.lighthouse_role
 ansible-galaxy install xo4ychill.lighthouse_role,1.0.0
 
 # Установка в кастомную директорию
-ansible-galaxy install xo4ychill.lighthouse-role -p ./roles
+ansible-galaxy install xo4ychill.lighthouse_role -p ./roles
 ```
 
