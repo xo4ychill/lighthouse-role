@@ -1,24 +1,175 @@
-# Lighthouse Role for Ansible
+# Ansible Role: lighthouse
 
-[![Ansible Role](https://img.shields.io/ansible/role/d/your_namespace/lighthouse_role)](https://galaxy.ansible.com/your_namespace/lighthouse_role)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Ansible Version](https://img.shields.io/badge/ansible-%3E%3D2.9-red.svg)](https://ansible.com)
+[![Platform](https://img.shields.io/badge/platform-linux-lightgrey.svg)](https://www.linux.org)
+[![GitHub Stars](https://img.shields.io/github/stars/your-org/ansible-lighthouse.svg)](https://github.com/your-org/ansible-lighthouse)
 
-> 🚀 Роль для деплоя [Lighthouse UI](https://github.com/xo4ychill/lighthouse) с Nginx reverse proxy.
+> 🚀 Production-ready Ansible role для развёртывания веб-интерфейса Lighthouse с Nginx reverse-proxy, расширенным логированием, безопасностью и мониторингом.
 
-## 🔧 Требования
+---
 
-- Ansible >= 2.14
-- Python 3 на контроллере и целевых хостах
-- sudo-права на целевых хостах
+## 📑 Оглавление
 
-## 🚀 Быстрый старт
+- [Ansible Role: lighthouse](#ansible-role-lighthouse)
+  - [📑 Оглавление](#-оглавление)
+  - [📋 Описание](#-описание)
+  - [✨ Возможности](#-возможности)
+    - [🎯 Основные функции](#-основные-функции)
+    - [🔧 Дополнительные возможности](#-дополнительные-возможности)
+  - [⚙️ Требования](#️-требования)
+    - [Программное обеспечение](#программное-обеспечение)
+    - [Операционные системы](#операционные-системы)
+    - [Системные требования](#системные-требования)
+    - [Права доступа](#права-доступа)
+  - [📦 Зависимости](#-зависимости)
+  - [📥 Установка](#-установка)
+
+---
+
+## 📋 Описание
+
+Роль `lighthouse` предназначена для автоматизированного развёртывания веб-интерфейса [Lighthouse](https://github.com/GoogleChrome/lighthouse) — инструмента для аудита производительности, доступности и качества веб-приложений.
+
+Роль обеспечивает:
+
+| Компонент | Описание |
+|-----------|----------|
+| 📦 Установка пакетов | Автоматическая установка зависимостей через системный пакетный менеджер с обновлением кэша |
+| 🔄 Управление репозиторием | Клонирование/обновление репозитория с обработкой ошибок, повторными попытками и проверкой доступности |
+| ⚙️ Конфигурация Nginx | Генерация production-ready конфигурации с отдачей статики, кэшированием и безопасными заголовками |
+| 📝 Логирование | Раздельные логи доступа и ошибок с настраиваемым уровнем детализации и ротацией |
+| 🔐 Безопасность | Применение заголовков безопасности, отключение серверных токенов, блокировка скрытых файлов |
+| 🚀 Управление сервисом | Грациозный перезапуск Nginx через handlers, валидация конфигурации перед применением |
+| 🔍 Диагностика | Расширенное логирование ошибок, вывод диагностической информации при сбоях |
+
+Роль следует лучшим практикам Ansible: идемпотентность, обработка ошибок, поддержка `--check` режима, модульная структура.
+
+---
+
+## ✨ Возможности
+
+### 🎯 Основные функции
+
+- ✅ **Идемпотентная установка**: Повторный запуск не вызывает изменений, если конфигурация не менялась
+- ✅ **Обработка ошибок**: Автоматические повторные попытки при проблемах с сетью или клонированием
+- ✅ **Валидация конфигурации**: Проверка `nginx -t` перед применением изменений
+- ✅ **Graceful reload**: Перезагрузка Nginx без разрыва активных соединений
+- ✅ **Безопасность по умолчанию**: Заголовки XSS, Clickjacking, MIME-sniffing protection
+- ✅ **Гибкая настройка**: Все параметры вынесены в переменные с разумными значениями по умолчанию
+
+### 🔧 Дополнительные возможности
+
+- 🗂️ **Кэширование статики**: Автоматическая настройка `Cache-Control` для изображений, стилей, скриптов
+- 📊 **Мониторинг**: Совместимость с Prometheus-экспортером Nginx (опционально)
+- 🔄 **Hot reload**: Обновление контента без простоя сервиса
+- 🌐 **IPv6 support**: Полная поддержка двойного стека (IPv4/IPv6)
+- 🗄️ **Log rotation**: Интеграция с `logrotate` через стандартные пути Nginx
+
+---
+
+## ⚙️ Требования
+
+### Программное обеспечение
+
+| Компонент | Минимальная версия | Рекомендованная версия |
+|-----------|-------------------|----------------------|
+| Ansible | 2.9 | 2.15+ |
+| Python | 3.6 | 3.10+ |
+| Nginx | 1.18 | 1.24+ |
+| Git | 2.20 | 2.40+ |
+
+### Операционные системы
+
+Роль протестирована и поддерживается на следующих дистрибутивах:
 
 ```yaml
-- name: Deploy Lighthouse UI
-  hosts: lighthouse_hosts
-  become: true
-  roles:
-    - role: lighthouse-role
-      lighthouse_clickhouse_host: "clickhouse:8123"
-      lighthouse_clickhouse_database: "logs"
-      lighthouse_clickhouse_table: "events"
+# Поддерживаемые ОС
+- Ubuntu: [20.04, 22.04, 24.04]
+- Debian: [11, 12]
+- CentOS: [7, 8, 9]
+- RHEL: [8, 9]
+- AlmaLinux: [8, 9]
+- Rocky Linux: [8, 9]
+```
+
+### Системные требования
+
+```
+| Ресурс  | Минимум                                  | Рекомендовано                    |
+|---------|------------------------------------------|----------------------------------|
+| CPU     | 1 ядро                                   | 2 ядра                           |
+| RAM     | 512 MB                                   | 1 GB                             |
+| Disk    | 2 GB                                     | 5 GB                             |
+| Network | Доступ к интернету для клонирования репо | Локальный зеркальный репозиторий |
+```
+
+### Права доступа
+
+- Пользователь Ansible должен иметь sudo права на целевом хосте
+- Требуется доступ к портам 80/443 (или настраиваемому lighthouse_nginx_port)
+- Для клонирования приватных репозиториев: SSH-ключи или token аутентификация
+
+## 📦 Зависимости
+
+Роль предполагает, что базовые системные пакеты установлены. При необходимости добавьте следующие роли в requirements.yml:
+```yaml
+# requirements.yml
+---
+# Базовая настройка системы
+- name: geerlingguy.repo-epel
+  version: 1.0.0
+
+# Установка и настройка Nginx (если не управляется отдельно)
+- name: geerlingguy.nginx
+  version: 3.2.0
+  vars:
+    nginx_remove_default_vhost: true
+
+# Настройка firewall (опционально)
+- name: geerlingguy.firewall
+  version: 2.5.0
+```
+Установка зависимостей:
+```bash
+ansible-galaxy install -r requirements.yml
+```
+💡 Примечание: Роль самостоятельно устанавливает пакеты из lighthouse_packages, поэтому явное указание роли Nginx не требуется, если он уже установлен.
+
+## 📥 Установка
+
+- Через requirements.yml
+```yaml
+# galaxy.yml или requirements.yml
+collections:
+  - name: xo4ychill.lighthouse_role
+    source: https://galaxy.ansible.com
+    version: ">=1.0.0"
+
+roles:
+  - name: lighthouse
+    src: https://github.com/xo4ychill/lighthouse-role.git
+    scm: git
+    version: main
+```
+
+- Через Git
+```bash
+# Клонирование в директорию roles
+git clone https://github.com/xo4ychill/lighthouse-role.git roles/lighthouse
+
+# Или с использованием submodules
+git submodule add https://github.com/xo4ychill/lighthouse-role.git roles/lighthouse
+```
+- Через Ansible Galaxy
+```bash
+# Установка из Galaxy
+ansible-galaxy install xo4ychill.lighthouse_role
+
+# Установка конкретной версии
+ansible-galaxy install xo4ychill.lighthouse_role,1.0.0
+
+# Установка в кастомную директорию
+ansible-galaxy install xo4ychill.lighthouse-role -p ./roles
+```
+
